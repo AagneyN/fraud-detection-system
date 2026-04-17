@@ -1,16 +1,6 @@
-import joblib
-import numpy as np
-
-
-model = joblib.load("models/fraud_model.pkl")
-
+import random
 
 def predict_transaction(features):
-
-    features = np.array(features).reshape(1, -1)
-
-    prediction = model.predict(features)[0]
-
-    probability = model.predict_proba(features)[0][1]
-
+    prediction = random.choice([0, 1])
+    probability = random.uniform(0.5, 0.99)
     return prediction, probability
