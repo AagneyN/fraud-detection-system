@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Fraud Detection Dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Calistoga&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="background-glow"></div>
+
+<div class="container">
+
+<header class="hero">
+
+<h1 class="title">
+AI <span class="gradient-text">Fraud Detection</span>
+</h1>
+
+<p class="subtitle">
+Machine learning powered financial fraud monitoring
+</p>
+
+</header>
+
+<div class="card">
+
+<div class="input-group">
+
+<input
+id="features"
+placeholder="Enter 30 transaction values separated by commas"
+/>
+
+<div class="button-group">
+
+<button onclick="predict()" class="primary-btn">
+Analyze Transaction
+</button>
+
+<button onclick="generateTransaction()" class="secondary-btn">
+Generate Random Transaction
+</button>
+
+</div>
+
+</div>
+
+<div id="loading" class="loading hidden">
+Analyzing transaction...
+</div>
+
+<div id="result"></div>
+
+<div class="risk-bar hidden">
+<div id="risk-fill"></div>
+</div>
+
+<div class="chart-container">
+<canvas id="riskChart"></canvas>
+</div>
+
+</div>
+
+<section class="analytics">
+
+<h2 class="analytics-title">Fraud Analytics</h2>
+
+<div class="stats">
+
+<div class="stat-card">
+<h3 id="safeCount">0</h3>
+<p>Safe Transactions</p>
+</div>
+
+<div class="stat-card">
+<h3 id="fraudCount">0</h3>
+<p>Fraud Transactions</p>
+</div>
+
+</div>
+
+<div class="trend-chart">
+<canvas id="trendChart"></canvas>
+</div>
+
+</section>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
