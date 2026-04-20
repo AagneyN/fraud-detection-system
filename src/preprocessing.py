@@ -1,40 +1,44 @@
 import pandas as pd
-
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-from imblearn.over_sampling import SMOTE
+
+def load_data(file_path):
+    """
+    Load dataset from CSV file
+    """
+    data = pd.read_csv(file_path)
+    return data
 
 
-def load_data(path):
+def preprocess_data(data):
+    """
+    Preprocess dataset:
+    - Handle missing values
+    - Split features and target
+    - Scale features
+    """
 
-    df = pd.read_csv(path)
+    # Check target column
+    if "Class" not in data.columns:
+        raise Exception("Dataset must contain 'Class' column")
 
-    return df
+    # Handle missing values (if any)
+    data = data.dropna()
 
+    # Split features & target
+    X = data.drop("Class", axis=1)
+    y = data["Class"]
 
-def preprocess_data(df):
-
-    X = df.drop("Class", axis=1)
-    y = df["Class"]
-
+    # Scaling
     scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
 
-    X["Amount"] = scaler.fit_transform(X[["Amount"]])
+    return X_scaled, y, scaler
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=0.2,
-        random_state=42,
-        stratify=y
-    )
 
-    smote = SMOTE(random_state=42)
-
-    X_train_smote, y_train_smote = smote.fit_resample(
-        X_train,
-        y_train
-    )
-
-    return X_train_smote, X_test, y_train_smote, y_test
+def preprocess_input(input_data, scaler):
+    """
+    Preprocess new input data for prediction
+    """
+    input_scaled = scaler.transform(input_data)
+    return input_scaled

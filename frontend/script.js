@@ -16,13 +16,11 @@ async function predict() {
 
     let loading = document.getElementById("loading");
     let result = document.getElementById("result");
-    let bar = document.querySelector(".risk-bar");
-    let fill = document.getElementById("risk-fill");
 
     loading.classList.remove("hidden");
 
     try {
-        let response = await fetch("https://fraud-detection-system-95ef.onrender.com/predict", {
+        let response = await fetch("/predict", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -44,21 +42,22 @@ async function predict() {
 
     } catch (error) {
         loading.classList.add("hidden");
-        result.innerText = "Error connecting to server 😓";
-        console.error(error);
+        result.innerText = "Error connecting to server";
     }
 }
+
 
 function generateTransaction() {
     let values = [];
 
     for (let i = 0; i < 30; i++) {
-        let num = (Math.random() * 6 - 3).toFixed(3);
+        let num = (Math.random() * 6 - 3).toFixed(3); // wider range
         values.push(num);
     }
 
     document.getElementById("features").value = values.join(",");
 }
+
 
 function updateStats(prediction) {
     if (prediction.includes("Fraud")) {
@@ -71,18 +70,16 @@ function updateStats(prediction) {
     document.getElementById("safeCount").innerText = safeCount;
 }
 
+
 function updateResult(prediction, risk) {
     let result = document.getElementById("result");
 
-    let riskClass = risk > 50
-        ? "high-risk"
-        : "low-risk";
+    let riskClass = risk > 50 ? "high-risk" : "low-risk";
 
     result.className = riskClass;
-
-    result.innerText =
-        prediction + " — Fraud Risk: " + risk + "%";
+    result.innerText = prediction + " — Fraud Risk: " + risk + "%";
 }
+
 
 function updateRiskBar(risk) {
     let bar = document.querySelector(".risk-bar");
@@ -92,12 +89,11 @@ function updateRiskBar(risk) {
     fill.style.width = risk + "%";
 }
 
+
 function renderRiskChart(risk) {
     let ctx = document.getElementById("riskChart").getContext("2d");
 
-    if (riskChart) {
-        riskChart.destroy();
-    }
+    if (riskChart) riskChart.destroy();
 
     riskChart = new Chart(ctx, {
         type: "doughnut",
@@ -105,8 +101,7 @@ function renderRiskChart(risk) {
             labels: ["Fraud Risk", "Safe"],
             datasets: [{
                 data: [risk, 100 - risk],
-                backgroundColor: ["#ef4444", "#22c55e"],
-                borderWidth: 0
+                backgroundColor: ["#ef4444", "#22c55e"]
             }]
         },
         options: {
@@ -116,36 +111,23 @@ function renderRiskChart(risk) {
     });
 }
 
+
 function updateTrendChart(risk) {
     trendData.push(risk);
 
     let ctx = document.getElementById("trendChart").getContext("2d");
 
-    if (trendChart) {
-        trendChart.destroy();
-    }
+    if (trendChart) trendChart.destroy();
 
     trendChart = new Chart(ctx, {
         type: "line",
         data: {
             labels: trendData.map((_, i) => i + 1),
             datasets: [{
-                label: "Fraud Risk Trend",
                 data: trendData,
                 borderColor: "#4D7CFF",
-                backgroundColor: "rgba(77,124,255,0.2)",
-                tension: 0.4,
                 fill: true
             }]
-        },
-        options: {
-            plugins: { legend: { display: false } },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100
-                }
-            }
         }
     });
 }

@@ -1,48 +1,66 @@
+import pandas as pd
+import numpy as np
 import joblib
+import os
 
-from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, accuracy_score
 
-from xgboost import XGBClassifier
+print("Loading dataset...")
 
-from src.preprocessing import load_data, preprocess_data
+df = pd.read_csv("data/creditcard.csv")
 
+X = df.drop("Class", axis=1)
+y = df["Class"]
 
-def train():
+print("Handling class imbalance...")
 
-    df = load_data("data/creditcard.csv")
+# Balance dataset (IMPORTANT)
+fraud = df[df["Class"] == 1]
+normal = df[df["Class"] == 0].sample(len(fraud))
 
-    X_train, X_test, y_train, y_test = preprocess_data(df)
+df_balanced = pd.concat([fraud, normal])
 
-    models = {
+X = df_balanced.drop("Class", axis=1)
+y = df_balanced["Class"]
 
-        "Logistic Regression": LogisticRegression(max_iter=1000),
+print("Splitting data...")
 
-        "Decision Tree": DecisionTreeClassifier(),
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 
-        "Random Forest": RandomForestClassifier(n_estimators=100),
+print("Scaling features...")
 
-        "XGBoost": XGBClassifier()
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
-    }
+print("Training model...")
 
-    trained_models = {}
+model = RandomForestClassifier(
+    n_estimators=200,
+    class_weight="balanced",
+    random_state=42
+)
 
-    for name, model in models.items():
+model.fit(X_train, y_train)
 
-        print("Training", name)
+print("Evaluating model...")
 
-        model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
 
-        trained_models[name] = model
+print("\nAccuracy:", accuracy_score(y_test, y_pred))
+print("\nClassification Report:\n")
+print(classification_report(y_test, y_pred))
 
-    best_model = trained_models["Random Forest"]
+print("Saving model...")
 
-    joblib.dump(best_model, "models/fraud_model.pkl")
+os.makedirs("models", exist_ok=True)
 
-    print("Model saved successfully!")
+joblib.dump(model, "models/model.pkl")
+joblib.dump(scaler, "models/scaler.pkl")
 
-
-if __name__ == "__main__":
-    train()
+print("Training complete!")
